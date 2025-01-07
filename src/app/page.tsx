@@ -10,8 +10,41 @@ const page = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [file, setFile] = useState("");
   const createUser = api.user.createUser.useMutation();
   const { data: session } = useSession();
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.includes("application/pdf")) {
+      alert("Please upload a PDF file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64String = reader.result as string;
+      setFile(base64String); // Store the Base64 string
+    };
+
+    reader.onerror = () => {
+      console.error("Error reading file.");
+    };
+
+    reader.readAsDataURL(file); // Read the file as a Base64 string
+  };
+
+  const uploadFile = api.post.createPost.useMutation();
+
+  const handleUploadFile = () => {
+    if (!file) return;
+
+    uploadFile.mutate({
+      content: file,
+    });
+  };
 
   const toggleVariant = () => {
     if (authVarant === "LOGIN") {
@@ -91,8 +124,15 @@ const page = () => {
       <button onClick={toggleVariant}>
         {authVarant === "LOGIN" ? "Sign up" : "Log in"}
       </button>
+      <button onClick={() => signIn("google")}>gOOGLE</button>
 
       {users?.map((user) => <div key={user.id}>{user.email}</div>)}
+      <input
+        onChange={handleFile}
+        className="border-[1px] border-black"
+        type="file"
+      />
+      <button onClick={handleUploadFile}>Upload</button>
     </div>
   );
 };
