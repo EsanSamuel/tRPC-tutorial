@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
     // Convert the file Blob to a Buffer
     const arrayBuffer = await file.arrayBuffer();
     const imageBuffer = Buffer.from(arrayBuffer);
-    console.log(arrayBuffer)
 
     // Process the image with Sharp
     const convertedImageBuffer = await sharp(imageBuffer)
